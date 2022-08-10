@@ -44,8 +44,8 @@ contract CommunityNFT is ERC721, Ownable, ReentrancyGuard {
     }
 
     // ============ PUBLIC FUNCTIONS FOR MINTING ============
-    function mint(uint256 tokenId) external payable nonReentrant canMint {
-        _safeMint(msg.sender, tokenId);
+    function mint() external payable nonReentrant canMint {
+        _safeMint(msg.sender, nextTokenId());
         tokenCounter.increment();
     }
 

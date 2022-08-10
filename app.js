@@ -23,6 +23,7 @@ app.post("/deploy", async (req, res) => {
   const deployedContract = await deploy(tokenSupply);
   res.send({
     message: `Contract successfully deployed at: ${deployedContract.address}`,
+    contractAddress: deployedContract.address,
   });
 });
 

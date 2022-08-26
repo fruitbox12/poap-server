@@ -42,7 +42,7 @@ task("etherscan-verify", "Verifies on etherscan", async (taskArgs, hre) => {
  */
 module.exports = {
   solidity: "0.8.4",
-  defaultNetwork: "rinkeby",
+  defaultNetwork: "matic",
   settings: {
     optimizer: {
       enabled: true,
@@ -60,22 +60,27 @@ module.exports = {
       url: MAINNET_API_URL ?? "",
       accounts: [`0x${PRIVATE_KEY}`],
     },
-    polygon: {
+    matic: {
       url: POLYGON_API_URL ?? "",
       accounts: [`0x${PRIVATE_KEY}`],
+      gasPrice: 100000000000, // 10 gwei
     },
   },
   gasReporter: {
-    enabled: process.env.REPORT_GAS !== undefined,
+    enabled: true,
     currency: "USD",
+    gasPrice: 42,
+    token: "MATIC",
+    gasPriceApi:
+      "https://api.polygonscan.com/api?module=proxy&action=eth_gasPrice",
+    coinmarketcap: "c2e0fce9-e3c0-448c-8e62-124b6cfb7d8b",
   },
   etherscan: {
-    // Your API key for Etherscan
-    // Obtain one at https://etherscan.io/
-    apiKey: {
-      rinkeby: ETHERSCAN_API_KEY,
-      mainnet: ETHERSCAN_API_KEY,
-      polygon: POLYGONSCAN_API_KEY,
-    },
+    apiKey: POLYGONSCAN_API_KEY,
+    // apiKey: {
+    //   rinkeby: ETHERSCAN_API_KEY,
+    //   mainnet: ETHERSCAN_API_KEY,
+    //   matic: POLYGONSCAN_API_KEY ?? "",
+    // },
   },
 };

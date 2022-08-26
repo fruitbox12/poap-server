@@ -17,10 +17,14 @@ app.get("/", async (req, res) => {
 });
 
 app.post("/deploy", async (req, res) => {
-  console.log("req: ", req.body.tokenSupply);
+  const { tokenSupply, name, symbol, collectionURI } = req.body;
 
-  const tokenSupply = req.body.tokenSupply;
-  const deployedContract = await deploy(tokenSupply);
+  const deployedContract = await deploy(
+    tokenSupply,
+    name,
+    symbol,
+    collectionURI
+  );
   res.send({
     message: `Contract successfully deployed at: ${deployedContract.address}`,
     contractAddress: deployedContract.address,

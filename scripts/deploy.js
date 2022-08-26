@@ -1,9 +1,14 @@
 const hre = require("hardhat");
 
-async function deploy(tokenSupply) {
+async function deploy(tokenSupply, name, symbol, collectionURI) {
   const nft = await hre.ethers.getContractFactory("CommunityNFT");
 
-  const deployedContract = await nft.deploy(tokenSupply);
+  const deployedContract = await nft.deploy(
+    tokenSupply,
+    name,
+    symbol,
+    collectionURI
+  );
 
   await deployedContract.deployed();
 

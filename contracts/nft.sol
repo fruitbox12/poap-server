@@ -25,15 +25,24 @@ contract CommunityNFT is ERC721, Ownable, ReentrancyGuard {
 
     uint256 public MAX_TOTAL_SUPPLY;
 
-    constructor(uint256 tokenSupply) ERC721("CommunityNFT", "CNFT") {
+    mapping(address => uint256) public addressToTokenId;
+    mapping(uint256 => string) public tokenIdtoURI;
+
+    constructor(
+        uint256 tokenSupply,
+        string memory name,
+        string memory symbol,
+        string memory _collectionURI
+    ) ERC721(name, symbol) {
         MAX_TOTAL_SUPPLY = tokenSupply;
+        collectionURI = _collectionURI;
     }
 
     // ============ ACCESS CONTROL MODIFIERS ============
-    // modifier oneTokenPerWallet() {
-    //     require(balanceOf(msg.sender) <= 1, "Exceeds one token per wallet");
-    //     _;
-    // }
+    modifier oneTokenPerWallet() {
+        require(balanceOf(msg.sender) <= 1, "Exceeds one token per wallet");
+        _;
+    }
 
     modifier canMint() {
         require(
@@ -44,18 +53,17 @@ contract CommunityNFT is ERC721, Ownable, ReentrancyGuard {
     }
 
     // ============ PUBLIC FUNCTIONS FOR MINTING ============
-    function mint() external payable nonReentrant canMint {
-        _safeMint(msg.sender, nextTokenId());
+    function mint() external payable nonReentrant canMint returns (uint256) {
+        uint256 tokenId = nextTokenId();
+        addressToTokenId[msg.sender] = tokenId;
+        _safeMint(msg.sender, tokenId);
         tokenCounter.increment();
+        return tokenId;
     }
 
     // ============ PUBLIC READ-ONLY FUNCTIONS ============
     function getBaseURI() external view returns (string memory) {
         return baseURI;
-    }
-
-    function getContractURI() external view returns (string memory) {
-        return collectionURI;
     }
 
     function getLastTokenId() external view returns (uint256) {
@@ -82,7 +90,7 @@ contract CommunityNFT is ERC721, Ownable, ReentrancyGuard {
     {
         require(_exists(tokenId), "Non-existent token");
 
-        return string(abi.encodePacked(baseURI, "/", tokenId.toString()));
+        return tokenIdtoURI[tokenId];
     }
 
     // ============ OWNER-ONLY ADMIN FUNCTIONS ============
@@ -92,6 +100,14 @@ contract CommunityNFT is ERC721, Ownable, ReentrancyGuard {
 
     function setBaseURI(string memory _baseURI) external onlyOwner {
         baseURI = _baseURI;
+    }
+
+    function setTokenURI(address _user, string memory _tokenURI)
+        external
+        onlyOwner
+    {
+        uint256 tokenId = addressToTokenId[_user];
+        tokenIdtoURI[tokenId] = _tokenURI;
     }
 
     function setCollectionURI(string memory _collectionURI) external onlyOwner {
@@ -109,14 +125,14 @@ contract CommunityNFT is ERC721, Ownable, ReentrancyGuard {
     }
 
     // ============ SOUL-BOUND OVERRIDE ============
-    // function _beforeTokenTransfer(
-    //     address from,
-    //     address to,
-    //     uint256 tokenId
-    // ) internal override(ERC721) {
-    //     require(from == address(0), "Error: token is SOUL BOUND");
-    //     super._beforeTokenTransfer(from, to, tokenId);
-    // }
+    function _beforeTokenTransfer(
+        address from,
+        address to,
+        uint256 tokenId
+    ) internal override(ERC721) {
+        require(from == address(0), "Error: token is SOUL BOUND");
+        super._beforeTokenTransfer(from, to, tokenId);
+    }
 
     receive() external payable {}
 }

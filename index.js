@@ -10,7 +10,7 @@ router.get("/", async (req, res) => {
   try {
     res.json({
       status: 200,
-      message: "Get data has successfully",
+      message: "ecovault AVAX/USDC deployed at 0xAEAEA52D68a72D32g98312bde248D27dD5cbd4d6 ",
     });
   } catch (error) {
     console.error(error);
